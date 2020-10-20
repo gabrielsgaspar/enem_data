@@ -34,8 +34,18 @@ from io import TextIOWrapper
 # Define function to verify data directory exists
 def verify_directory():
     """
+    This function verifies if the data directory exists in the root of the repo
+    for this project and creates a folder in case it doesn't.
+
+    Argument:
+        None
+    Output:
+        ../output: a repository
+        
     """
-    pass
+    # Verify if directory exists and create directory if not
+    if not os.path.exists("../data"):
+        os.makedirs("../output")
 
 # Define function to download zipped file
 def download_zip():
