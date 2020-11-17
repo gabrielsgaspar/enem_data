@@ -29,7 +29,8 @@ import csv
 import requests
 import time
 from zipfile import ZipFile
-from io import TextIOWrapper
+from io import TextIOWrapper, BytesIO
+from tqdm.auto import tqdm
 
 # Define function to verify data directory exists
 def verify_directory():
@@ -41,18 +42,22 @@ def verify_directory():
         None
     Output:
         ../output: a repository
-        
+
     """
     # Verify if directory exists and create directory if not
     if not os.path.exists("../data"):
         os.makedirs("../output")
 
 # Define function to download zipped file
-def download_zip():
+def download_zip(url, save_path):
     """
     Include description
     """
-    pass
+    # Make request and get zipped file
+    r = requests.get(url, stream = True)
+    z = ZipFile(BytesIO(r.content))
+    # Save zip file to desired path
+    z.extractall("../data")
 
 # Define function to unzip downloaded file
 def unzip_file():
@@ -99,7 +104,7 @@ def main():
     verify_directory()
     time.sleep(1)
     # Loop through available years to gather data
-    for key in enem_links.keys():
+    for key in tqdm(enem_links.keys()):
         for link in enem_links[key]:
             # Download the data as a zip file
             download_zip(link)
