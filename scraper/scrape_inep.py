@@ -25,9 +25,10 @@ By: @gabrielsgaspar
 """
 
 # Import libraries
-import csv
-import requests
+import csv, os
+import urllib
 import time
+from urllib.request import urlopen, Request
 from zipfile import ZipFile
 from io import TextIOWrapper, BytesIO
 from tqdm.auto import tqdm
@@ -49,29 +50,48 @@ def verify_directory():
         os.makedirs("../output")
 
 # Define function to download zipped file
-def download_zip(url, save_path):
+def download_zip(url, save_name):
     """
-    Include description
+    Downloads zip files from url and saves it under save_name in the data folder
     """
-    # Make request and get zipped file
-    r = requests.get(url, stream = True)
-    z = ZipFile(BytesIO(r.content))
-    # Save zip file to desired path
-    z.extractall("../data")
+    # Set up user-agent header with url to download
+    req = Request(url,
+                 data = None,
+                 headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36"}
+                 )
+    # Make request to url page
+    with urlopen(req) as download_file:
+        # Set up path and name of saved zip file
+        with open("../data/{}".format(save_name), "wb") as out_file:
+            out_file.write(download_file.read())
 
 # Define function to unzip downloaded file
-def unzip_file():
+def unzip_csv(zip_name, csv_name, new_name):
     """
-    Include description
+    Unzips files extracted in download_zip function, extracts only relevant csvs and saves them
     """
-    pass
+    # Open zip files
+    with ZipFile(zip_name) as zf:
+        with zf.open(csv_name, "r") as infile:
+            file = csv.reader(TextIOWrapper(infile, encoding = "utf-8", errors = "ignore"))
+            # Open as writer
+            with open(new_name, "w") as new_file:
+                writer = csv.writer(new_file)
+                # Loop over to save
+                for line in file:
+                    writer.writerow(line)
 
 # Define function to delete zip file
-def delete_zip():
+def delete_zip(ext):
     """
-    Include description
+    Deletes files with the passed argument in current working directory
     """
-    pass
+    # Get files in directory in list
+    files = os.listdir("../data")
+    # Loop to find files with extension and delete
+    for file in files:
+        if file.endswith(ext):
+            os.remove(os.path.join(dir, file))
 
 # Define main function to call script
 def main():
@@ -83,11 +103,13 @@ def main():
                   ) )
                 (----)-)
                  \__/-'
-                `----'  @gabrielsgaspar
+                `----'
+
+        @gabrielsgaspar
         """)
     # Set links to download
     enem_links = {
-                "enem_2009": "http://download.inep.gov.br/microdados/microdados_enem2009.zip",
+                "enem_2009":"http://download.inep.gov.br/microdados/microdados_enem2009.zip",
                 "enem_2010":"http://download.inep.gov.br/microdados/microdados_enem2010_2.zip",
                 "enem_2011":"http://download.inep.gov.br/microdados/microdados_enem2011.zip",
                 "enem_2012":"http://download.inep.gov.br/microdados/microdados_enem2012.zip",
@@ -105,16 +127,14 @@ def main():
     time.sleep(1)
     # Loop through available years to gather data
     for key in tqdm(enem_links.keys()):
-        for link in enem_links[key]:
-            # Download the data as a zip file
-            download_zip(link)
-            time.sleep(1)
-            # Unzip the zipper file
-            unzip_file()
-            time.sleep(1)
-            # Delete old zip file
-            delete_zip()
-            time.sleep(1)
+        # Download the data as a zip file
+        download_zip(enem_links[key],str(key + ".zip"))
+        time.sleep(1)
+        # Unzip the zipper file
+        unzip_file("../data/{}.zip".format(key), enem_links[key].split("/")[-1].replace("zip", "csv"), "../data/{}.csv".format(key))
+        time.sleep(1)
+    # Delete old zip file
+    delete_zip(".zip")
     # Complete output message
     print("Downloading of ENEM data complete!")
 
