@@ -1,3 +1,5 @@
 .DS_Store
 scraper/env/*
 notebooks/.ipynb_checkpoints/*
+data/*
+env/*
