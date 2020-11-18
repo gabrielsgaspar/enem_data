@@ -25,7 +25,7 @@ By: @gabrielsgaspar
 """
 
 # Import libraries
-import csv, os
+import csv, os, wget
 import urllib
 import time
 from urllib.request import urlopen, Request
@@ -46,33 +46,25 @@ def verify_directory():
 
     """
     # Verify if directory exists and create directory if not
-    if not os.path.exists("../data"):
-        os.makedirs("../output")
+    if not os.path.exists("../data/enem"):
+        os.makedirs("../data/enem")
 
 # Define function to download zipped file
 def download_zip(url, save_name):
     """
     Downloads zip files from url and saves it under save_name in the data folder
     """
-    # Set up user-agent header with url to download
-    req = Request(url,
-                 data = None,
-                 headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36"}
-                 )
-    # Make request to url page
-    with urlopen(req) as download_file:
-        # Set up path and name of saved zip file
-        with open("../data/{}".format(save_name), "wb") as out_file:
-            out_file.write(download_file.read())
+    # Download data and save in data with name in argument
+    wget.download(url, out = "../data/enem/{}".format(save_name))
 
 # Define function to unzip downloaded file
-def unzip_csv(zip_name, csv_name, new_name):
+def unzip_file(zip_name, csv_name, new_name):
     """
     Unzips files extracted in download_zip function, extracts only relevant csvs and saves them
     """
     # Open zip files
     with ZipFile(zip_name) as zf:
-        with zf.open(csv_name, "r") as infile:
+        with zf.open("DADOS/{}.csv".format(csv_name.upper()), "r") as infile:
             file = csv.reader(TextIOWrapper(infile, encoding = "utf-8", errors = "ignore"))
             # Open as writer
             with open(new_name, "w") as new_file:
@@ -87,11 +79,11 @@ def delete_zip(ext):
     Deletes files with the passed argument in current working directory
     """
     # Get files in directory in list
-    files = os.listdir("../data")
+    files = os.listdir("../data/enem")
     # Loop to find files with extension and delete
     for file in files:
         if file.endswith(ext):
-            os.remove(os.path.join(dir, file))
+            os.remove(os.path.join("../data/enem/", file))
 
 # Define main function to call script
 def main():
@@ -103,35 +95,33 @@ def main():
                   ) )
                 (----)-)
                  \__/-'
-                `----'
-
-        @gabrielsgaspar
+                `----'      @gabrielsgaspar
         """)
     # Set links to download
     enem_links = {
-                "enem_2009":"http://download.inep.gov.br/microdados/microdados_enem2009.zip",
-                "enem_2010":"http://download.inep.gov.br/microdados/microdados_enem2010_2.zip",
-                "enem_2011":"http://download.inep.gov.br/microdados/microdados_enem2011.zip",
-                "enem_2012":"http://download.inep.gov.br/microdados/microdados_enem2012.zip",
-                "enem_2013":"http://download.inep.gov.br/microdados/microdados_enem2013.zip",
-                "enem_2014":"http://download.inep.gov.br/microdados/microdados_enem2014.zip",
-                "enem_2015":"http://download.inep.gov.br/microdados/microdados_enem2015.zip",
-                "enem_2016":"http://download.inep.gov.br/microdados/microdados_enem2016.zip",
-                "enem_2017":"http://download.inep.gov.br/microdados/microdados_enem2017.zip",
-                "enem_2018":"http://download.inep.gov.br/microdados/microdados_enem2018.zip",
+                #"enem_2009":"http://download.inep.gov.br/microdados/microdados_enem2009.zip",
+                #"enem_2010":"http://download.inep.gov.br/microdados/microdados_enem2010_2.zip",
+                #"enem_2011":"http://download.inep.gov.br/microdados/microdados_enem2011.zip",
+                #"enem_2012":"http://download.inep.gov.br/microdados/microdados_enem2012.zip",
+                #"enem_2013":"http://download.inep.gov.br/microdados/microdados_enem2013.zip",
+                #"enem_2014":"http://download.inep.gov.br/microdados/microdados_enem2014.zip",
+                #"enem_2015":"http://download.inep.gov.br/microdados/microdados_enem2015.zip",
+                #"enem_2016":"http://download.inep.gov.br/microdados/microdados_enem2016.zip",
+                #"enem_2017":"http://download.inep.gov.br/microdados/microdados_enem2017.zip",
+                #"enem_2018":"http://download.inep.gov.br/microdados/microdados_enem2018.zip",
                 "enem_2019":"http://download.inep.gov.br/microdados/microdados_enem_2019.zip"
                 }
     # Verify if data directory exists
-    print("Verifying if directory for museum exists ...")
+    print("Verifying if data directory for ENEM exists ...")
     verify_directory()
     time.sleep(1)
     # Loop through available years to gather data
     for key in tqdm(enem_links.keys()):
         # Download the data as a zip file
-        download_zip(enem_links[key],str(key + ".zip"))
+        #download_zip(enem_links[key],str(key + ".zip"))
         time.sleep(1)
         # Unzip the zipper file
-        unzip_file("../data/{}.zip".format(key), enem_links[key].split("/")[-1].replace("zip", "csv"), "../data/{}.csv".format(key))
+        unzip_file("../data/enem/{}.zip".format(key), enem_links[key].split("/")[-1].replace(".zip", ""), "../data/enem/{}.csv".format(key))
         time.sleep(1)
     # Delete old zip file
     delete_zip(".zip")
