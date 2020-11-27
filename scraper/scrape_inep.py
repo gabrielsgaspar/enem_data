@@ -26,9 +26,7 @@ By: @gabrielsgaspar
 
 # Import libraries
 import csv, os, wget
-import urllib
 import time
-from urllib.request import urlopen, Request
 from zipfile import ZipFile
 from io import TextIOWrapper, BytesIO
 from tqdm.auto import tqdm
@@ -99,16 +97,16 @@ def main():
         """)
     # Set links to download
     enem_links = {
-                #"enem_2009":"http://download.inep.gov.br/microdados/microdados_enem2009.zip",
-                #"enem_2010":"http://download.inep.gov.br/microdados/microdados_enem2010_2.zip",
-                #"enem_2011":"http://download.inep.gov.br/microdados/microdados_enem2011.zip",
-                #"enem_2012":"http://download.inep.gov.br/microdados/microdados_enem2012.zip",
-                #"enem_2013":"http://download.inep.gov.br/microdados/microdados_enem2013.zip",
-                #"enem_2014":"http://download.inep.gov.br/microdados/microdados_enem2014.zip",
-                #"enem_2015":"http://download.inep.gov.br/microdados/microdados_enem2015.zip",
-                #"enem_2016":"http://download.inep.gov.br/microdados/microdados_enem2016.zip",
-                #"enem_2017":"http://download.inep.gov.br/microdados/microdados_enem2017.zip",
-                #"enem_2018":"http://download.inep.gov.br/microdados/microdados_enem2018.zip",
+                "enem_2009":"http://download.inep.gov.br/microdados/microdados_enem2009.zip",
+                "enem_2010":"http://download.inep.gov.br/microdados/microdados_enem2010_2.zip",
+                "enem_2011":"http://download.inep.gov.br/microdados/microdados_enem2011.zip",
+                "enem_2012":"http://download.inep.gov.br/microdados/microdados_enem2012.zip",
+                "enem_2013":"http://download.inep.gov.br/microdados/microdados_enem2013.zip",
+                "enem_2014":"http://download.inep.gov.br/microdados/microdados_enem2014.zip",
+                "enem_2015":"http://download.inep.gov.br/microdados/microdados_enem2015.zip",
+                "enem_2016":"http://download.inep.gov.br/microdados/microdados_enem2016.zip",
+                "enem_2017":"http://download.inep.gov.br/microdados/microdados_enem2017.zip",
+                "enem_2018":"http://download.inep.gov.br/microdados/microdados_enem2018.zip",
                 "enem_2019":"http://download.inep.gov.br/microdados/microdados_enem_2019.zip"
                 }
     # Verify if data directory exists
@@ -118,7 +116,7 @@ def main():
     # Loop through available years to gather data
     for key in tqdm(enem_links.keys()):
         # Download the data as a zip file
-        #download_zip(enem_links[key],str(key + ".zip"))
+        download_zip(enem_links[key],str(key + ".zip"))
         time.sleep(1)
         # Unzip the zipper file
         unzip_file("../data/enem/{}.zip".format(key), enem_links[key].split("/")[-1].replace(".zip", ""), "../data/enem/{}.csv".format(key))
